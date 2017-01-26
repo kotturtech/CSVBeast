@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
-using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
-using Astronautics.ABMS.Common.CSVExport.Errata;
+using KotturTech.CSVBeast.CSVTable.Interfaces;
+using KotturTech.CSVBeast.Customization.Interfaces;
+using KotturTech.CSVBeast.Errata;
 
-namespace Astronautics.ABMS.Common.CSVExport.Customization.Implementations
+namespace KotturTech.CSVBeast.Customization.Implementations
 {
     /// <summary>
     /// ComponentListCSVExporter used for exporting members of classes - collections of components.

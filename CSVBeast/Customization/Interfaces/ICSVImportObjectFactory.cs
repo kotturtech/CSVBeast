@@ -1,6 +1,6 @@
-﻿using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
+﻿using KotturTech.CSVBeast.CSVTable.Interfaces;
 
-namespace Astronautics.ABMS.Common.CSVExport.Customization.Interfaces
+namespace KotturTech.CSVBeast.Customization.Interfaces
 {
     /// <summary>
     /// Interface for a factory for creating imported objects during import of CSV data

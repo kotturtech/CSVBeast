@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces
+namespace KotturTech.CSVBeast.CSVTable.Interfaces
 {
     /// <summary>
     /// Interface for CSV column for use with CSVTable object

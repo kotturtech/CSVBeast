@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
+using KotturTech.CSVBeast.CSVTable.Interfaces;
 
-namespace Astronautics.ABMS.Common.CSVExport.CSVTable
+namespace KotturTech.CSVBeast.CSVTable
 {
     public class CSVTable
     {

@@ -52,6 +52,8 @@
     <Compile Include="CSVTable\Interfaces\ICSVRow.cs" />
     <Compile Include="CSVTable\Interfaces\ICSVColumn.cs" />
     <Compile Include="Customization\Implementations\ComponentListCSVExporter.cs" />
+    <Compile Include="Customization\Implementations\DefaultCSVExporter.cs" />
+    <Compile Include="Customization\Implementations\ExtendedCSVExporter.cs" />
     <Compile Include="Customization\Interfaces\ICSVImportObjectFactory.cs" />
     <Compile Include="Customization\Interfaces\ICustomCSVExporter.cs" />
     <Compile Include="Errata\CSVImportExportErrorEventArgs.cs" />

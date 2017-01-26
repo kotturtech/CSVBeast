@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Astronautics.ABMS.Common.CSVExport.CSVDataBuilder
+namespace KotturTech.CSVBeast.CSVDataBuilder
 {
     internal interface ICSVMemberExportInfo
     {

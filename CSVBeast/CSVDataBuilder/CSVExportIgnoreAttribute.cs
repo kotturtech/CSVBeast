@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Astronautics.ABMS.Common.CSVExport.CSVDataBuilder
+namespace KotturTech.CSVBeast.CSVDataBuilder
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class CSVExportIgnoreAttribute : Attribute

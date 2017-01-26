@@ -1,5 +1,5 @@
 ﻿
-namespace Astronautics.ABMS.Common.CSVExport.Errata
+namespace KotturTech.CSVBeast.Errata
 {
     public enum CSVImportErrorSeverity
     {

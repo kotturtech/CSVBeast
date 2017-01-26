@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
-using Astronautics.ABMS.Common.CSVExport.Errata;
+using KotturTech.CSVBeast.CSVTable.Interfaces;
+using KotturTech.CSVBeast.Errata;
 
-namespace Astronautics.ABMS.Common.CSVExport.Customization.Interfaces
+namespace KotturTech.CSVBeast.Customization.Interfaces
 {
     public interface ICustomCSVExporter
     {

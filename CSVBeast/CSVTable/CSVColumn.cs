@@ -1,7 +1,7 @@
 ﻿using System;
-using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
+using KotturTech.CSVBeast.CSVTable.Interfaces;
 
-namespace Astronautics.ABMS.Common.CSVExport.CSVTable
+namespace KotturTech.CSVBeast.CSVTable
 {
     /// <summary>
     /// Class that encapsulates a CSV column and allows sorting the columns according to user specified order

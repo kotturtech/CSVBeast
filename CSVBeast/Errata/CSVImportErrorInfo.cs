@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Astronautics.ABMS.Common.CSVExport.Errata
+namespace KotturTech.CSVBeast.Errata
 {
     public class CSVImportErrorInfo : ICSVImportErrorInfo
     {

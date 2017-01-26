@@ -1,17 +1,10 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using KotturTech.CSVBeast;
-using KotturTech.CSVBeast.CSVDataBuilder;
-using KotturTech.CSVBeast.Customization.Implementations;
-using KotturTech.CSVBeast.Errata;
+using System.Linq;
 
 namespace ValidationTest
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     namespace BasicComponentTest
     {
         class ArtistInfo

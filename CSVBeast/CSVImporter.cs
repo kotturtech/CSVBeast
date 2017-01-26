@@ -4,14 +4,17 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Astronautics.ABMS.Common.CSVExport.CSVDataBuilder;
-using Astronautics.ABMS.Common.CSVExport.CSVTable;
-using Astronautics.ABMS.Common.CSVExport.Customization.Implementations;
-using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
-using Astronautics.ABMS.Common.CSVExport.Errata;
+using KotturTech.CSVBeast.CSVDataBuilder;
+using KotturTech.CSVBeast.CSVTable;
+using KotturTech.CSVBeast.Customization.Interfaces;
+using KotturTech.CSVBeast.Errata;
 
-namespace Astronautics.ABMS.Common.CSVExport
+namespace KotturTech.CSVBeast
 {
+
+    /// <summary>
+    /// Class responsible for importing (loading) data from CSV files
+    /// </summary>
     public class CSVImporter
     {
 
@@ -96,6 +99,10 @@ namespace Astronautics.ABMS.Common.CSVExport
 
         #region Constructor
 
+        /// <summary>
+        /// New instance of CSVImporter
+        /// </summary>
+        /// <param name="fileNameAndPath">Source CSV file to load</param>
         public CSVImporter(string fileNameAndPath)
         {
             FileNameAndPath = fileNameAndPath;

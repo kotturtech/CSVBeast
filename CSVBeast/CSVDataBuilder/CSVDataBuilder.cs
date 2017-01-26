@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
-using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
-using Astronautics.ABMS.Common.CSVExport.Customization.Implementations;
-using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
-using Astronautics.ABMS.Common.CSVExport.Errata;
+using KotturTech.CSVBeast.CSVTable.Interfaces;
+using KotturTech.CSVBeast.Customization.Implementations;
+using KotturTech.CSVBeast.Customization.Interfaces;
+using KotturTech.CSVBeast.Errata;
 
-namespace Astronautics.ABMS.Common.CSVExport.CSVDataBuilder
+namespace KotturTech.CSVBeast.CSVDataBuilder
 {
     public class CSVDataBuilder
     {

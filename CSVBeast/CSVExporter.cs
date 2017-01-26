@@ -4,17 +4,19 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Windows;
-using Astronautics.ABMS.Common.CSVExport.CSVDataBuilder;
-using Astronautics.ABMS.Common.CSVExport.Errata;
+using KotturTech.CSVBeast.CSVDataBuilder;
+using KotturTech.CSVBeast.Errata;
 
-namespace Astronautics.ABMS.Common.CSVExport
+namespace KotturTech.CSVBeast
 {
     public class CSVExporter
     {
 
         #region Nested Types
 
-
+        /// <summary>
+        /// Specifies behavior in case target file exists
+        /// </summary>
         public enum TargetFileExistsBehavior
         {
             OverwriteWithPrompt,
@@ -22,6 +24,9 @@ namespace Astronautics.ABMS.Common.CSVExport
             HaltWithError
         }
 
+        /// <summary>
+        /// Specifies mode of overwriting existing file
+        /// </summary>
         public enum FileOverwriteBehavior
         {
             Truncate,
@@ -41,6 +46,10 @@ namespace Astronautics.ABMS.Common.CSVExport
 
         #region Constructor
 
+        /// <summary>
+        /// Creates new CSVExporter class instance
+        /// </summary>
+        /// <param name="fileNameAndPath">Target file to save</param>
         public CSVExporter(string fileNameAndPath)
         {
             FileNameAndPath = fileNameAndPath;
