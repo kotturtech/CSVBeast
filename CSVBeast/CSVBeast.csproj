@@ -7,7 +7,7 @@
     <ProjectGuid>{127AD9E4-F163-4B5F-A236-F2FEC89E80DF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSVBeast</RootNamespace>
+    <RootNamespace>KotturTech.CSVBeast</RootNamespace>
     <AssemblyName>CSVBeast</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

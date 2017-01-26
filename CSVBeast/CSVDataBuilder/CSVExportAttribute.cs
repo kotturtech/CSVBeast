@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using CSVBeast.CSVTable.Interfaces;
-using CSVBeast.Customization.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
 
-namespace CSVBeast.CSVDataBuilder
+namespace Astronautics.ABMS.Common.CSVExport.CSVDataBuilder
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class CSVExportAttribute : Attribute, ICSVMemberExportInfo

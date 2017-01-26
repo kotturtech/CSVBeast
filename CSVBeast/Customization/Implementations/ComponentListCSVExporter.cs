@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CSVBeast.CSVTable.Interfaces;
-using CSVBeast.Customization.Interfaces;
-using CSVBeast.Errata;
+using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Errata;
 
-namespace CSVBeast.Customization.Implementations
+namespace Astronautics.ABMS.Common.CSVExport.Customization.Implementations
 {
     /// <summary>
     /// ComponentListCSVExporter used for exporting members of classes - collections of components.
@@ -36,7 +36,7 @@ namespace CSVBeast.Customization.Implementations
 
             //Creating CSV table from member collection
             var itemsCSVTable = new CSVTable.CSVTable();
-            CSVDataBuilder.CSVDataBuilder builder = new CSVDataBuilder.CSVDataBuilder();
+            CSVDataBuilder.CSVDataBuilder builder = new CSVDataBuilder.CSVDataBuilder {DefaultExporterType = typeof(ExtendedCSVExporter)};
             builder.BuildCSVTable(items, itemsCSVTable);
             int counter = 0;
             //Appending the rows from resulting table to the target table
@@ -77,7 +77,7 @@ namespace CSVBeast.Customization.Implementations
                         "Corrupt value of column {0}, could cause an attempt to read more lines than table actually contains",
                         columnInfo.ColumnName))
                 {
-                    RowIndex = currentRowIndex
+                    RowIndex = currentRowIndex + 1
                 };
             }
 
@@ -86,7 +86,7 @@ namespace CSVBeast.Customization.Implementations
 
             //Use the importer to create dataset - The target types need to be retrieved using reflection
             Type elementType = GetElementType(targetType);
-            CSVDataBuilder.CSVDataBuilder builder = new CSVDataBuilder.CSVDataBuilder();
+            CSVDataBuilder.CSVDataBuilder builder = new CSVDataBuilder.CSVDataBuilder { DefaultExporterType = typeof(ExtendedCSVExporter) };
             Type dataSetType = typeof(List<>);
             dataSetType = dataSetType.MakeGenericType(elementType);
             var dataSet = Activator.CreateInstance(dataSetType);
@@ -101,7 +101,7 @@ namespace CSVBeast.Customization.Implementations
             {
                 foreach (var error in objErrors)
                 {
-                    errors.Add(new CSVImportErrorInfo(error.Severity,string.Format("Member Dataset import error: {0}",error.Message),error.RowIndex + currentRowIndex,error.Exception));
+                    errors.Add(new CSVImportErrorInfo(error.Severity,string.Format("Member Dataset import error: {0}",error.Message),error.RowIndex + currentRowIndex + 1,error.Exception));
                 }
             }
 
@@ -135,7 +135,7 @@ namespace CSVBeast.Customization.Implementations
         {
             if (targetType.IsArray)
                 return targetType.GetElementType();
-            var genericParams = targetType.GenericTypeArguments;
+            var genericParams = targetType.GetGenericArguments();
             var interfaces = targetType.GetInterfaces();
             foreach (var genericParam in genericParams)
             {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CSVBeast.CSVTable.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
 
-namespace CSVBeast.CSVTable
+namespace Astronautics.ABMS.Common.CSVExport.CSVTable
 {
     public class CSVTable
     {
@@ -109,6 +109,8 @@ namespace CSVBeast.CSVTable
 
             public override string ToString()
             {
+                if (!_items.Any())
+                    return "";
                 StringBuilder sb = new StringBuilder();
                 foreach (var key in _items)
                 {

@@ -1,16 +1,16 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using CSVBeast.Errata;
+using KotturTech.CSVBeast;
+using KotturTech.CSVBeast.CSVDataBuilder;
+using KotturTech.CSVBeast.Customization.Implementations;
+using KotturTech.CSVBeast.Errata;
 
 namespace ValidationTest
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using CSVBeast;
-    using CSVBeast.CSVDataBuilder;
-    using CSVBeast.Customization.Implementations;
 
     namespace BasicComponentTest
     {

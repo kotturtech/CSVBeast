@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using CSVBeast;
-using CSVBeast.CSVDataBuilder;
-using CSVBeast.Customization.Implementations;
-using CSVBeast.Customization.Interfaces;
-using CSVBeast.Errata;
+using KotturTech.CSVBeast;
+using KotturTech.CSVBeast.CSVDataBuilder;
+using KotturTech.CSVBeast.CSVTable.Interfaces;
+using KotturTech.CSVBeast.Customization.Implementations;
+using KotturTech.CSVBeast.Customization.Interfaces;
+using KotturTech.CSVBeast.Errata;
 
 namespace InheritedObjectsTest
 {
@@ -119,7 +120,7 @@ namespace InheritedObjectsTest
     class GuitarRecordTypeFactory : ICSVImportObjectFactory<GuitarData>
     {
 
-        public void CreateObject(CSVBeast.CSVTable.Interfaces.ICSVRow iCSVRow, out GuitarData targetObject)
+        public void CreateObject(ICSVRow iCSVRow, out GuitarData targetObject)
         {
             object value;
             if (iCSVRow.GetValue("RecordType", out value))

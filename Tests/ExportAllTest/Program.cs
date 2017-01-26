@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
-using CSVBeast;
-using CSVBeast.CSVDataBuilder;
-using CSVBeast.Customization.Implementations;
-using CSVBeast.Errata;
+using KotturTech.CSVBeast;
+using KotturTech.CSVBeast.Errata;
 
 namespace ExportAllTest
 {

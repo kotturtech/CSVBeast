@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CSVBeast.CSVTable.Interfaces
+namespace Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces
 {
     public interface ICSVRow
     {

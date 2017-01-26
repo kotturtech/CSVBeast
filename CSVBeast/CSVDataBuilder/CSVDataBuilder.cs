@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using CSVBeast.CSVTable.Interfaces;
-using CSVBeast.Customization.Interfaces;
-using CSVBeast.Errata;
-using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
-using CSVBeast.Customization.Implementations;
+using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Customization.Implementations;
+using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Errata;
 
-namespace CSVBeast.CSVDataBuilder
+namespace Astronautics.ABMS.Common.CSVExport.CSVDataBuilder
 {
     public class CSVDataBuilder
     {
@@ -26,7 +25,7 @@ namespace CSVBeast.CSVDataBuilder
             public bool SkipOnImport { get; private set; }
             private readonly ICustomCSVExporter _valueExporter;
             private readonly IEnumerable<ValidationAttribute> _validationAttributes;
-            
+
 
             protected CSVExportMemberInfo(ICSVMemberExportInfo exportData, IEnumerable<ValidationAttribute> validationAttributes)
             {
@@ -76,7 +75,7 @@ namespace CSVBeast.CSVDataBuilder
                 }
                 catch (CSVImportException e)
                 {
-                    e.RowIndex = currentRowIndex;
+                    e.RowIndex = e.RowIndex == -1 ? currentRowIndex + 1 : e.RowIndex;
                     errors.Add(e);
                     return consumedRows;
                 }
@@ -84,7 +83,7 @@ namespace CSVBeast.CSVDataBuilder
                 {
                     errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Fatal,
                         string.Format("Value exporter of type {0} failed to import value for class member: {1}, CSV Column Name: {2}", _valueExporter.GetType().FullName, MemberName, ColumnName),
-                        currentRowIndex, e));
+                        currentRowIndex+1, e));
                     return consumedRows;
                 }
 
@@ -96,16 +95,16 @@ namespace CSVBeast.CSVDataBuilder
                         if (validationAttribute.IsValid(importedMemberValue))
                             continue;
                         var result = validationAttribute.GetValidationResult(importedMemberValue,
-                            new ValidationContext(importedMemberValue));
+                            new ValidationContext(importedMemberValue,null,null));
                         errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Error,
                             string.Format("Column {0} contains invalid value. Value is {1} Validation error is: {2}",
                                 ColumnName, importedMemberValue, result != null ? result.ErrorMessage : "Unknown Error"),
-                            currentRowIndex));
+                            currentRowIndex+1));
                     }
                 }
                 catch (CSVImportException e)
                 {
-                    e.RowIndex = currentRowIndex;
+                    e.RowIndex = currentRowIndex+1;
                     errors.Add(e);
                     return consumedRows;
                 }
@@ -113,7 +112,7 @@ namespace CSVBeast.CSVDataBuilder
                 {
                     errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Fatal,
                         string.Format("Validation process failed for column value: {0}, class member {1} ", ColumnName, MemberName),
-                        currentRowIndex, e));
+                        currentRowIndex+1, e));
                     return consumedRows;
                 }
 
@@ -124,14 +123,14 @@ namespace CSVBeast.CSVDataBuilder
                 }
                 catch (CSVImportException e)
                 {
-                    e.RowIndex = currentRowIndex;
+                    e.RowIndex = currentRowIndex+1;
                     errors.Add(e);
                 }
                 catch (Exception e)
                 {
                     errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Fatal,
                         string.Format("Coulnd't assign value {0} to class member: {1}", importedMemberValue, MemberName),
-                        currentRowIndex, e));
+                        currentRowIndex+1, e));
                 }
 
                 return consumedRows;
@@ -163,11 +162,11 @@ namespace CSVBeast.CSVDataBuilder
             {
                 if (!_propertyInfo.CanWrite)
                     throw new CSVImportException(
-                        string.Format("Property {0} is a read-only property, can't assign value to it",_propertyInfo.Name))
+                        string.Format("Property {0} is a read-only property, can't assign value to it", _propertyInfo.Name))
                     {
                         Severity = CSVImportErrorSeverity.Debug
                     };
-                _propertyInfo.SetValue(target, value);
+                _propertyInfo.SetValue(target, value,null);
             }
 
             protected override Type TargetType
@@ -255,144 +254,6 @@ namespace CSVBeast.CSVDataBuilder
 
         #region Default Interface Implementations
 
-        private class DefaultCSVExporter : ICustomCSVExporter
-        {
-            public void ExportToCSVTable(CSVTable.CSVTable targetTable, ICSVColumn columnInfo, ICSVRow row, object item)
-            {
-                if (item is IEnumerable && typeof(string) != item.GetType())
-                {
-                    var listExporter = new ComponentListCSVExporter();
-                    listExporter.ExportToCSVTable(targetTable, columnInfo, row, item);
-                }
-                else
-                {
-                    targetTable.AddColumn(columnInfo);
-                    row.SetValue(columnInfo.ColumnName, item);
-                }
-            }
-
-            public int ImportMemberFromCSV(CSVTable.CSVTable csvTable, int currentRowIndex, ICSVColumn columnInfo, Type targetType, out object convertedValue, ICollection<ICSVImportErrorInfo> errors)
-            {
-                //Get relevant column value from the table
-                var row = csvTable[currentRowIndex];
-                object columnValue;
-                if (!row.GetValue(columnInfo.ColumnName, out columnValue))
-                {
-                    errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Error,
-                        string.Format("CSV table doesn't contain the requested column: {0}", columnInfo.ColumnName),
-                        currentRowIndex));
-                    convertedValue = null;
-                    return 0;
-                }
-
-                //Things get tricky now - Need to find a way to convert the source object to target type correctly
-
-                //Case 1: In case the value is null
-                var notString = targetType != typeof(string);
-                if (columnValue == null || (notString && string.IsNullOrWhiteSpace(columnValue.ToString()))) //If the column value is null - check if null can be assigned to target member
-                {
-                    if (targetType.IsValueType)
-                    {
-                        errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Error,
-                        string.Format("Column {0} contains null value, which can't be assigned to property or field of type: {1}", columnInfo.ColumnName, targetType.FullName),
-                        currentRowIndex));
-                        convertedValue = null;
-                        return 0;
-                    }
-                    convertedValue = null;
-                    return 0;
-                }
-
-                //Case 2: Type has TypeConverterAttribute
-                var typeConverterAttribute =
-                    targetType.GetCustomAttributes(typeof(System.ComponentModel.TypeConverterAttribute), true).FirstOrDefault() as System.ComponentModel.TypeConverterAttribute;
-                if (typeConverterAttribute != null)
-                {
-                    try
-                    {
-                        var converterType = Type.GetType(typeConverterAttribute.ConverterTypeName, false, true);
-                        TypeConverter converter;
-                        if (converterType == typeof(EnumConverter) || converterType.BaseType == typeof(EnumConverter))
-                        {
-                            //In case of enum converter it is known that it has constructor that gets type as parameter
-                            converter = Activator.CreateInstance(converterType, new object[] { targetType }) as TypeConverter;
-                        }
-                        else
-                        {
-                            converter = Activator.CreateInstance(converterType) as TypeConverter;
-                        }
-
-                        if (converter != null)
-                        {
-                            convertedValue = converter.ConvertFromString(columnValue.ToString());
-                            return 0;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        //Ignore
-                    }
-                }
-
-                //Case 3: IEnumerable, since string is also IEnumerable we exclude the case of string here
-                if (notString && targetType.GetInterfaces().Any(x => x.Name.Contains("IEnumerable")))
-                {
-                    var listExporter = new ComponentListCSVExporter();
-                    return listExporter.ImportMemberFromCSV(csvTable, currentRowIndex, columnInfo, targetType,
-                        out convertedValue, errors);
-                }
-
-                //Case 4: IConvertible, attempt to use it if applicable
-                if (targetType.GetInterfaces().Any(x => x == typeof(IConvertible)))
-                {
-                    try
-                    {
-                        convertedValue = Convert.ChangeType(columnValue, targetType);
-                        return 0;
-                    }
-                    catch (Exception e)
-                    {
-                        errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Error,
-                        string.Format("Column {0} contains value: {1}, which can't be converted to target value of type: {2}", columnInfo.ColumnName, columnValue, targetType.FullName),
-                        currentRowIndex, e));
-                        convertedValue = null;
-                        return 0;
-                    }
-                }
-
-                //Case 5: If the type is simply assignable from the source type
-                if (targetType.IsAssignableFrom(columnValue.GetType())) //If value from column can be just assigned to target type = leave things as they are
-                {
-                    convertedValue = columnValue;
-                    return 0;
-                }
-
-                //Case 6: Wild guess - Try to retrieve Parse method and use it
-                var parseMethod = targetType.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static);
-                if (parseMethod != null)
-                {
-                    try
-                    {
-                        convertedValue = parseMethod.Invoke(null, new object[] { columnValue.ToString() });
-                        return 0;
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
-                }
-
-                //No method could convert? Report error!
-                errors.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Error,
-                        string.Format("Column: {0} contains value: {1}, which can't be converted to target value of type: {2}", columnInfo.ColumnName, columnValue, targetType.FullName),
-                        currentRowIndex));
-
-                convertedValue = null;
-                return 0;
-
-            }
-        }
-
         private class DefaultImportTypeFactory<T> : ICSVImportObjectFactory<T>
         {
             public void CreateObject(ICSVRow iCSVRow, out T targetObject)
@@ -412,8 +273,8 @@ namespace CSVBeast.CSVDataBuilder
             public string ColumnName { get; set; }
             public int SortOrder { get; set; }
             public bool SkipOnImport { get; private set; }
-            public Type CustomExporterType { get; private set; }
-            
+            public Type CustomExporterType { get; set; }
+
         }
 
         #endregion
@@ -443,6 +304,11 @@ namespace CSVBeast.CSVDataBuilder
         /// </summary>
         public CSVExportTargets ExportTargets { get; set; }
 
+        /// <summary>
+        /// Specifies the type of the default exporter
+        /// </summary>
+        public Type DefaultExporterType { get; set; }
+
         #endregion
 
         #region Public Methods
@@ -453,7 +319,7 @@ namespace CSVBeast.CSVDataBuilder
         /// </summary>
         /// <param name="sourceCollection">The source dataset to build CSV table from</param>
         /// <param name="table">The CSV table object to fill</param>
-        public void BuildCSVTable(IEnumerable sourceCollection,CSVTable.CSVTable table)
+        public void BuildCSVTable(IEnumerable sourceCollection, CSVTable.CSVTable table)
         {
             foreach (var item in sourceCollection)
             {
@@ -478,15 +344,32 @@ namespace CSVBeast.CSVDataBuilder
                 typeFactory = new DefaultImportTypeFactory<T>();
 
             var currentRowIndex = 0;
-            while (currentRowIndex < sourceTable.RowCount)
+            try
             {
-                T targetObject;
-                typeFactory.CreateObject(sourceTable[currentRowIndex], out targetObject);
-                var exporter = GetExporterForType(targetObject.GetType());
-                currentRowIndex += exporter.FillObject(sourceTable, currentRowIndex, targetObject, errorsCollection);
-                dataset.Add(targetObject);
+                while (currentRowIndex < sourceTable.RowCount)
+                {
+                    T targetObject;
+                    typeFactory.CreateObject(sourceTable[currentRowIndex], out targetObject);
+                    var exporter = GetExporterForType(targetObject.GetType());
+                    currentRowIndex += exporter.FillObject(sourceTable, currentRowIndex, targetObject, errorsCollection);
+                    dataset.Add(targetObject);
+                }
+            }
+            catch (Exception e)
+            {
+                var item = e as CSVImportException;
+                if (item != null)
+                {
+                    item.RowIndex = currentRowIndex + 1;
+                    errorsCollection.Add(item);
+                }
+                else
+                {
+                    errorsCollection.Add(new CSVImportErrorInfo(CSVImportErrorSeverity.Fatal, e.Message, currentRowIndex, e));
+                }
             }
             errors = errorsCollection;
+           
         }
 
         #endregion
@@ -499,7 +382,7 @@ namespace CSVBeast.CSVDataBuilder
                 return _typeExportersDictionary[type.FullName];
 
             var typeExportInfo = new TypeCSVExporter();
-            var objectExportSettings = (type.GetCustomAttributes(typeof (CSVExportAllAttribute), true).FirstOrDefault() as CSVExportAllAttribute);
+            var objectExportSettings = (type.GetCustomAttributes(typeof(CSVExportAllAttribute), true).FirstOrDefault() as CSVExportAllAttribute);
             bool shouldExportProperties = (ExportTargets & CSVExportTargets.Properties) > 0, shouldExportFields = (ExportTargets & CSVExportTargets.Fields) > 0;
             if (objectExportSettings != null)
             {
@@ -515,21 +398,22 @@ namespace CSVBeast.CSVDataBuilder
                 var validationAttrs = prop.GetCustomAttributes(typeof(ValidationAttribute), true);
                 if (attrs.Any())
                 {
-                    typeExportInfo.AddExportedMemberInfo(
-                        new PropertyCSVExportMemberInfo((CSVExportAttribute) attrs.First(),
-                            validationAttrs.OfType<ValidationAttribute>(), prop));
+                    var attr = (CSVExportAttribute)attrs.First();
+                    attr.CustomExporterType = DefaultExporterType;
+                    typeExportInfo.AddExportedMemberInfo(new PropertyCSVExportMemberInfo(attr,validationAttrs.OfType<ValidationAttribute>(), prop));
                 }
                 else
                 {
-                    if (shouldExportProperties && !(prop.GetCustomAttributes(typeof (CSVExportIgnoreAttribute), true).Any() || prop.GetCustomAttributes(typeof (XmlIgnoreAttribute), true).Any()))
+                    if (shouldExportProperties && !(prop.GetCustomAttributes(typeof(CSVExportIgnoreAttribute), true).Any() || prop.GetCustomAttributes(typeof(XmlIgnoreAttribute), true).Any()))
                     {
                         var info = new CSVMemberExportInfo(!prop.CanWrite)
                         {
                             ColumnName = prop.Name,
-                            SortOrder = memberCounter++
+                            SortOrder = memberCounter++,
+                            CustomExporterType = DefaultExporterType
                         };
-                         typeExportInfo.AddExportedMemberInfo(
-                         new PropertyCSVExportMemberInfo(info,validationAttrs.OfType<ValidationAttribute>(), prop));
+                        typeExportInfo.AddExportedMemberInfo(
+                        new PropertyCSVExportMemberInfo(info, validationAttrs.OfType<ValidationAttribute>(), prop));
                     }
                 }
             }
@@ -538,18 +422,26 @@ namespace CSVBeast.CSVDataBuilder
                 var attrs = field.GetCustomAttributes(typeof(CSVExportAttribute), true);
                 var validationAttrs = field.GetCustomAttributes(typeof(ValidationAttribute), true);
                 if (attrs.Any())
-                    typeExportInfo.AddExportedMemberInfo(new FieldCSVExportMemberInfo((CSVExportAttribute)attrs.First(), validationAttrs.OfType<ValidationAttribute>(), field));
+                {
+                    var attr = (CSVExportAttribute) attrs.First();
+                    attr.CustomExporterType = DefaultExporterType;
+                    typeExportInfo.AddExportedMemberInfo(new FieldCSVExportMemberInfo(attr,
+                                                                                      validationAttrs.OfType<ValidationAttribute>(), field));
+                }
                 else
                 {
-                    if (shouldExportFields && !(field.GetCustomAttributes(typeof (CSVExportIgnoreAttribute), true).Any() || field.GetCustomAttributes(typeof (XmlIgnoreAttribute), true).Any()))
+                    if (shouldExportFields &&
+                        !(field.GetCustomAttributes(typeof (CSVExportIgnoreAttribute), true).Any() ||
+                          field.GetCustomAttributes(typeof (XmlIgnoreAttribute), true).Any()))
                     {
                         var info = new CSVMemberExportInfo(false)
-                        {
-                            ColumnName = field.Name,
-                            SortOrder = memberCounter++
-                        };
-                         typeExportInfo.AddExportedMemberInfo(
-                         new FieldCSVExportMemberInfo(info,validationAttrs.OfType<ValidationAttribute>(), field));
+                                   {
+                                       ColumnName = field.Name,
+                                       SortOrder = memberCounter++,
+                                       CustomExporterType = DefaultExporterType
+                                   };
+                        typeExportInfo.AddExportedMemberInfo(
+                            new FieldCSVExportMemberInfo(info, validationAttrs.OfType<ValidationAttribute>(), field));
                     }
                 }
             }

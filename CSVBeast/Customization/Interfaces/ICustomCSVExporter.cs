@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using CSVBeast.CSVTable.Interfaces;
-using CSVBeast.Errata;
+using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Errata;
 
-namespace CSVBeast.Customization.Interfaces
+namespace Astronautics.ABMS.Common.CSVExport.Customization.Interfaces
 {
     public interface ICustomCSVExporter
     {
@@ -14,7 +14,7 @@ namespace CSVBeast.Customization.Interfaces
         /// <param name="columnInfo"></param>
         /// <param name="row"></param>
         /// <param name="item"></param>
-        void ExportToCSVTable(CSVTable.CSVTable table, ICSVColumn columnInfo,ICSVRow row, object item);
+        void ExportToCSVTable(CSVTable.CSVTable table, ICSVColumn columnInfo, ICSVRow row, object item);
 
         /// <summary>
         /// Imports value from CSV table string to target object

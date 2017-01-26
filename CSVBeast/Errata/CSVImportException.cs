@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace CSVBeast.Errata
+namespace KotturTech.CSVBeast.Errata
 {
     [Serializable]
     public class CSVImportException : Exception, ICSVImportErrorInfo

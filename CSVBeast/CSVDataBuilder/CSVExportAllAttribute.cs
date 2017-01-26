@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CSVBeast.CSVDataBuilder
+namespace Astronautics.ABMS.Common.CSVExport.CSVDataBuilder
 {
     [Flags]
     public enum CSVExportTargets

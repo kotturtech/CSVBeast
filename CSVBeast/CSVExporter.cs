@@ -1,16 +1,14 @@
-﻿using CSVBeast.CSVDataBuilder;
-using CSVBeast.Errata;
+﻿using System;
+using System.Collections;
+using System.ComponentModel;
+using System.IO;
+using System.Text;
+using System.Windows;
+using Astronautics.ABMS.Common.CSVExport.CSVDataBuilder;
+using Astronautics.ABMS.Common.CSVExport.Errata;
 
-namespace CSVBeast
+namespace Astronautics.ABMS.Common.CSVExport
 {
-    using System;
-    using System.Collections;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Text;
-    using System.Windows;
-
-
     public class CSVExporter
     {
 
@@ -91,6 +89,12 @@ namespace CSVBeast
 
 
         /// <summary>
+        /// Specifies type for default exporter
+        /// </summary>
+        public Type DefaultExporterType { get; set; }
+
+
+        /// <summary>
         /// Event that indicates that progress of the export was changed
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged
@@ -154,7 +158,7 @@ namespace CSVBeast
                 fileStream = File.Open(FileNameAndPath, _fileCreationMode, FileAccess.Write);
                 fileStreamWriter = new StreamWriter(fileStream, CharacterEncoding);
 
-                var builder = new CSVDataBuilder.CSVDataBuilder {ExportTargets = ExportTargets};
+                var builder = new CSVDataBuilder.CSVDataBuilder { ExportTargets = ExportTargets, DefaultExporterType = DefaultExporterType };
                 builder.BuildCSVTable(data, table);
                 fileStreamWriter.WriteLine(table.GetCSVHeader());
                 var rowcount = table.RowCount;
@@ -273,6 +277,4 @@ namespace CSVBeast
         }
         #endregion
     }
-
-
 }

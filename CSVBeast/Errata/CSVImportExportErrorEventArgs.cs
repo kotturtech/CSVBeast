@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CSVBeast.Errata
+namespace Astronautics.ABMS.Common.CSVExport.Errata
 {
     public class CSVImportExportErrorEventArgs : EventArgs
     {

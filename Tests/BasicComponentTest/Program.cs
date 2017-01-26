@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSVBeast;
-using CSVBeast.CSVDataBuilder;
-using CSVBeast.Customization.Implementations;
-using CSVBeast.Errata;
+using KotturTech.CSVBeast;
+using KotturTech.CSVBeast.CSVDataBuilder;
+using KotturTech.CSVBeast.Customization.Implementations;
+using KotturTech.CSVBeast.Errata;
 
 namespace BasicComponentTest
 {

@@ -1,6 +1,6 @@
-﻿using CSVBeast.CSVTable.Interfaces;
+﻿using Astronautics.ABMS.Common.CSVExport.CSVTable.Interfaces;
 
-namespace CSVBeast.Customization.Interfaces
+namespace Astronautics.ABMS.Common.CSVExport.Customization.Interfaces
 {
     /// <summary>
     /// Interface for a factory for creating imported objects during import of CSV data

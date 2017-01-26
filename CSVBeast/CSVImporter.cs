@@ -4,12 +4,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CSVBeast.CSVDataBuilder;
-using CSVBeast.CSVTable;
-using CSVBeast.Customization.Interfaces;
-using CSVBeast.Errata;
+using Astronautics.ABMS.Common.CSVExport.CSVDataBuilder;
+using Astronautics.ABMS.Common.CSVExport.CSVTable;
+using Astronautics.ABMS.Common.CSVExport.Customization.Implementations;
+using Astronautics.ABMS.Common.CSVExport.Customization.Interfaces;
+using Astronautics.ABMS.Common.CSVExport.Errata;
 
-namespace CSVBeast
+namespace Astronautics.ABMS.Common.CSVExport
 {
     public class CSVImporter
     {
@@ -21,7 +22,7 @@ namespace CSVBeast
         private bool _disposed;
         private EventHandler<ProgressChangedEventArgs> _progressChanged;
         private EventHandler<CSVImportExportErrorEventArgs> _errorOccurred;
-        private const string FormatErrorString =
+        private const string FORMAT_ERROR_STRING =
             "File {0} is corrupt, or not a valid CSV file, error occurred while processing line {1}";
         private Encoding _characterEncoding;
         private int _newlineCharsLength;
@@ -53,7 +54,12 @@ namespace CSVBeast
         /// <summary>
         /// Specifies which members to export by default, in case no attributes set on target type
         /// </summary>
-        public CSVExportTargets ExportTargets { get; set; }
+        public CSVExportTargets ImportTargets { get; set; }
+
+        /// <summary>
+        /// Specifies type for default exporter
+        /// </summary>
+        public Type DefaultExporterType { get; set; }
 
         /// <summary>
         /// Event that indicates that progress of table loading was changed
@@ -94,7 +100,7 @@ namespace CSVBeast
         {
             FileNameAndPath = fileNameAndPath;
             CharacterEncoding = Encoding.ASCII;
-            ExportTargets = CSVExportTargets.Properties;
+            ImportTargets = CSVExportTargets.Properties;
         }
 
         #endregion
@@ -107,12 +113,14 @@ namespace CSVBeast
         /// <typeparam name="T">Base type of dataset items</typeparam>
         /// <param name="dataset">Collection that will contain imported items</param>
         /// <param name="typeFactory">Type factory for creation of objects according to values in imported row</param>
-        public void ImportToDataSet<T>(ICollection<T> dataset,ICSVImportObjectFactory<T> typeFactory = null)
+        public void ImportToDataSet<T>(ICollection<T> dataset, ICSVImportObjectFactory<T> typeFactory = null)
         {
             var table = ImportCSVTableFromFile();
-            var builder = new CSVDataBuilder.CSVDataBuilder { ExportTargets = ExportTargets }; 
+            if (table == null) //Table might be null in case of error
+                return;
+            var builder = new CSVDataBuilder.CSVDataBuilder { ExportTargets = ImportTargets, DefaultExporterType = DefaultExporterType };
             IEnumerable<ICSVImportErrorInfo> errors;
-            builder.BuildTypeDataSet(table, dataset, out errors,typeFactory);
+            builder.BuildTypeDataSet(table, dataset, out errors, typeFactory);
             var csvImportErrorInfos = errors as ICSVImportErrorInfo[] ?? errors.ToArray();
             if (csvImportErrorInfos.Any() && _errorOccurred != null)
                 _errorOccurred.Invoke(this, new CSVImportExportErrorEventArgs(csvImportErrorInfos));
@@ -144,7 +152,7 @@ namespace CSVBeast
                 var header = _fileStreamReader.ReadLine();
 
                 if (string.IsNullOrEmpty(header))
-                    throw new FileFormatException(string.Format(FormatErrorString, FileNameAndPath, lineCounter));
+                    throw new FileFormatException(string.Format(FORMAT_ERROR_STRING, FileNameAndPath, lineCounter));
                 var splitHeader = header.Split(',');
                 var columnCounter = 0;
                 table.AddColumns(from column in splitHeader select new CSVColumn(column, ++columnCounter));
@@ -159,10 +167,10 @@ namespace CSVBeast
                     var row = _fileStreamReader.ReadLine();
 
                     if (string.IsNullOrEmpty(row))
-                        throw new FileFormatException(string.Format(FormatErrorString, FileNameAndPath, lineCounter));
+                        throw new FileFormatException(string.Format(FORMAT_ERROR_STRING, FileNameAndPath, lineCounter));
                     var splitRow = row.Split(',');
                     if (splitRow.Length != splitHeader.Length)
-                        throw new FileFormatException(string.Format(FormatErrorString, FileNameAndPath, lineCounter));
+                        throw new FileFormatException(string.Format(FORMAT_ERROR_STRING, FileNameAndPath, lineCounter));
 
                     bytesRead += _characterEncoding.GetBytes(row).Length + _newlineCharsLength;
 
@@ -199,7 +207,7 @@ namespace CSVBeast
 
         #endregion
 
-  
+
         #region Private Methods
         private void Cleanup()
         {
