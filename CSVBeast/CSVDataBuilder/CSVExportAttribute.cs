@@ -4,6 +4,10 @@ using KotturTech.CSVBeast.Customization.Interfaces;
 
 namespace KotturTech.CSVBeast.CSVDataBuilder
 {
+    /// <summary>
+    /// When set on a property or a field, this attribute indicates that the field or property should be exported
+    /// to CSV
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class CSVExportAttribute : Attribute, ICSVMemberExportInfo
     {
@@ -11,10 +15,24 @@ namespace KotturTech.CSVBeast.CSVDataBuilder
 
         #region Public Properties
 
+        /// <summary>
+        /// The CSV column name, if different than class member name
+        /// </summary>
         public string ColumnName { get; private set; }
+
+        /// <summary>
+        /// Order of the column in exported CSV file
+        /// </summary>
         public int SortOrder { get; set; }
+
+        /// <summary>
+        /// Indicates whether this member should be skipped on import
+        /// </summary>
         public bool SkipOnImport { get; set; }
 
+        /// <summary>
+        /// Specifies the custom exporter for type of this class member
+        /// </summary>
         public Type CustomExporterType
         {
             get { return _customExporterType; }

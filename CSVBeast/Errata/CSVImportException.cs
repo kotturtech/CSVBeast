@@ -34,8 +34,19 @@ namespace KotturTech.CSVBeast.Errata
         {
         }
 
+        /// <summary>
+        /// Error Severity
+        /// </summary>
         public CSVImportErrorSeverity Severity { get; set; }
+        
+        /// <summary>
+        /// Index of row in CSV file, where the error occurred
+        /// </summary>
         public int RowIndex { get; set; }
+
+        /// <summary>
+        /// Exception that caused the error
+        /// </summary>
         public Exception Exception
         {
             get { return this; }

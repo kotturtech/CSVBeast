@@ -8,6 +8,11 @@ using KotturTech.CSVBeast.Errata;
 
 namespace BasicComponentTest
 {
+
+    /*This example shows a simple loading of CSV files - It demonstrates how classes should be decorated with attributes in order to
+     use the CSV export or import feature*/
+
+    #region Data Classes
     class ArtistInfo
     {
         [CSVExport("Name", SortOrder = 5)]
@@ -77,8 +82,11 @@ namespace BasicComponentTest
         }
     }
 
+    #endregion
+
     class Program
     {
+        #region Test Data Generation Logic
         private GuitarData[] _dataSet;
 
         private Dictionary<string, string[]> _manufacturersToModels = new Dictionary<string, string[]>
@@ -123,6 +131,8 @@ namespace BasicComponentTest
                 _dataSet[i] = gtr;
             }
         }
+
+        #endregion
 
         static void Main(string[] args)
         {

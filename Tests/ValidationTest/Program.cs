@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using KotturTech.CSVBeast;
+using KotturTech.CSVBeast.CSVDataBuilder;
+using KotturTech.CSVBeast.Customization.Implementations;
+using KotturTech.CSVBeast.Errata;
 
 namespace ValidationTest
 {

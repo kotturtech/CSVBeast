@@ -1,6 +1,10 @@
 ﻿
 namespace KotturTech.CSVBeast.Errata
 {
+
+    /// <summary>
+    /// Describes severity of an error
+    /// </summary>
     public enum CSVImportErrorSeverity
     {
         Debug = 1,

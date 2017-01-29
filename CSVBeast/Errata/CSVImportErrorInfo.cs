@@ -13,9 +13,24 @@ namespace KotturTech.CSVBeast.Errata
             Exception = exception;
         }
 
+        /// <summary>
+        /// Severity of an error
+        /// </summary>
         public CSVImportErrorSeverity Severity { get; protected set; }
+        
+        /// <summary>
+        /// Error message
+        /// </summary>
         public string Message { get; protected set; }
+        
+        /// <summary>
+        /// Index of CSV row at which the error occurred
+        /// </summary>
         public int RowIndex { get; protected set; }
+
+        /// <summary>
+        /// Exception that caused the error
+        /// </summary>
         public Exception Exception { get; protected set; }
     }
 }
